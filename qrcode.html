@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+
+    <title>在线生成APP二维码</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE11" />
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+    <script>
+    </script>
+    <style>
+        html {
+            position: relative;
+            min-height: 100%;
+        }
+
+        body {
+            margin-bottom: 60px;
+        }
+
+        .container {
+            background: #f8f8f8;
+            padding: 2px 20px 20px;
+            min-height: 650px;
+        }
+
+        #qrcode {
+            margin: 15px auto;
+            padding-left: 200px;
+        }
+
+        .tip {
+            padding: 12px;
+            margin: 10px auto;
+            border-radius: 5px;
+        }
+
+        .page-header {
+            margin-top: 10px;
+        }
+
+        .page-header small {
+            font-size: 12px;
+        }
+
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        .input-group .input-group-addon {
+            width: 200px;
+            text-align: right;
+        }
+
+        .input-group .form-control {
+            width: 800px
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>在线生成APP二维码 <small>(网页使用有问题请联系:<a href="mailto:jinhui.lu@tcl.com?subject=生成二维码网页问题相关">jinhui.lu@tcl.com</a>)</small></h1>
+        </div>
+        <div class="containerBox">
+            <p class="tip bg-danger">请确保填写的APP网址正确，否则生成的二维码扫描时无法正常跳转到APP下载页面</p>
+            <div class="input-group">
+                <span class="input-group-addon">Android APP 链接地址:</span>
+                <input class="form-control" id="androidLink" placeholder="Android" style="width:800px">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">IOS APP 链接地址:</span>
+                <input class="form-control" id="iosLink" placeholder="IOS">
+            </div>
+            <button style="margin:10px 200px;padding:5px 30px" class="btn btn-info" onclick="madeQrcode()">生成二维码</button>
+
+            <div id="qrcode"></div>
+            <div class="tip bg-success">右键二维码选择另存为保存二维码图片</div>
+            <b>二维码实际链接路径：</b>
+            <div id="qrcode_link_txt"></div>
+        </div>
+
+    </div>
+    <div id="alertsModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Alert</h4>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function getUrlOrigin() {
+            if (location.origin != undefined) {
+                return location.origin
+            }
+            var loc = window.location;
+            var portStr = "";
+            if (loc.port != 80) {
+                portStr = ":" + loc.port;
+            }
+            return loc.protocol + "//" + loc.hostname + portStr;
+        }
+        var pathname = location.pathname.split("/");
+        var qrcodeURL = getUrlOrigin() + pathname.slice(0, pathname.length - 1).join("/") + "/" + "qrcodelink.html";
+
+        function madeQrcode() {
+            var $qrcode = $('#qrcode');
+            $qrcode.html("");
+            var $androidLink = $("#androidLink");
+            var $iosLink = $("#iosLink")
+            var androidLink = $.trim($androidLink.val());
+            var iosLink = $.trim($iosLink.val());
+            if (androidLink === "") {
+                alerts("请输入Android APP 链接地址", function () {
+                    $androidLink.focus();
+                })
+                return false;
+            }
+            if (iosLink === "") {
+                alerts("请输入IOS APP 链接地址", function () {
+                    $iosLink.focus();
+                })
+                return false;
+            }
+            //encodeURIComponent
+            //decodeURIComponent
+            var qrcodeLink = qrcodeURL + "?iosLink=" + encodeURIComponent(
+                    iosLink) +
+                "&androidLink=" + encodeURIComponent(androidLink);
+            $qrcode.qrcode(qrcodeLink);
+            $("#qrcode_link_txt").html(qrcodeLink)
+        }
+
+        function alerts(msg, cb) {
+            var $alertsModal = $('#alertsModal');
+            $alertsModal.find(".modal-body").html(msg);
+            $alertsModal.modal({})
+            $alertsModal.on('hidden.bs.modal', function (e) {
+                if ($.isFunction(cb)) {
+                    cb()
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>
